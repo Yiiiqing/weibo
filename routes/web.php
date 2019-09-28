@@ -11,6 +11,6 @@
 |
 */
 
-Route::get('/','StaticPagesController@home');
-Route::get('/help','StaticPagesController@help');
-Route::get('/about','StaticPagesController@about');
+Route::get('/','StaticPagesController@home')->name('home');
+Route::get('/help','StaticPagesController@help')->name('help');//后面name为给路由起名字,这样路由可以写不同的url
+Route::get('/about','StaticPagesController@about')->name('about');
