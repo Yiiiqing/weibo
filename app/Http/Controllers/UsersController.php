@@ -24,4 +24,14 @@ class UsersController extends Controller
         return view('users.show', compact('user'));//我们将用户对象  $user  通过  compact  方法转化为一个关联数组，并作为第二个参数传递给  view  方法，将数据与视图进行绑定。
 
     }
+
+    public function store(Request $request){
+        //validate  方法接收两个参数，第一个参数为用户的输入数据，第二个参数为该输入数据的验证规则。
+        $this->validate($request,[
+            'name' => 'required|max:50',
+            'email' => 'required|email|unique:users|max:255',
+            'password' => 'required|confirmed|min:6'
+        ]);
+        return;
+    }
 }
