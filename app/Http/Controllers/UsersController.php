@@ -32,14 +32,23 @@ class UsersController extends Controller
             'email' => 'required|email|unique:users|max:255',
             'password' => 'required|confirmed|min:6'
         ]);
+<<<<<<< HEAD
+=======
+
+>>>>>>> 5866415510aff0cf208ce83d7e5f37261f17c762
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => bcrypt($request->password),
         ]);
+<<<<<<< HEAD
         session()->flash('success', '欢迎，您将在这里开启一段新的旅程~');
 
         return redirect()->route('users.show', [$user]);
 
+=======
+        session()->flash('success','欢迎，您将在这里开启一段新的旅程~');//flash  方法接收两个参数，第一个为会话的键，第二个为会话的值
+        return redirect()->route('users.show',[$user]);
+>>>>>>> 5866415510aff0cf208ce83d7e5f37261f17c762
     }
 }
