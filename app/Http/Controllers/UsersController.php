@@ -25,7 +25,8 @@ class UsersController extends Controller
 
     }
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         //validate  方法接收两个参数，第一个参数为用户的输入数据，第二个参数为该输入数据的验证规则。
         $this->validate($request,[
             'name' => 'required|max:50',
@@ -42,5 +43,29 @@ class UsersController extends Controller
         Auth::login($user);
         session()->flash('success','欢迎，您将在这里开启一段新的旅程~');//flash  方法接收两个参数，第一个为会话的键，第二个为会话的值
         return redirect()->route('users.show',[$user]);
+    }
+    public function edit(User $user)
+    {
+        return view('users.edit', compact('user'));//绑定，在将用户数据与视图进行绑定之后，便可以在视图上通过  $user  来访问用户对象
+
+    }
+    public function update(User $user, Request $request)
+    {
+        $this->validate($request,[
+            'name' => 'required|max:50',
+            'password' => 'nullable|confirmed|min:6'
+        ]);
+
+        $data = [];
+        $data['name'] = $request->name;
+        // 当其值不为空时才将其赋值给  data ，避免将空白密码保存到数据库中。
+        if ($request->password) {
+            $data['password'] = bcrypt($request->password);
+        }
+        $user->update($data);
+
+        session()->flash('success','个人资料更新成功！');
+
+        return redirect()->route('users.show', $user);
     }
 }
