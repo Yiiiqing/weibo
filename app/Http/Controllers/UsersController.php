@@ -10,7 +10,18 @@ use Auth;
 
 class UsersController extends Controller
 {
-    //
+    //中间件过滤
+    //PHP 的构造器方法，当一个类对象被创建之前该方法将会被调
+    public function __construct()
+    {
+        $this->middleware('auth',[
+            'except' => ['show','create','store']
+        ]);
+
+        $this->middleware('guest',[
+            'guest' => ['create']
+        ]);
+    }
     public function create()
     {
         return view('users.create');
@@ -46,11 +57,14 @@ class UsersController extends Controller
     }
     public function edit(User $user)
     {
+        $this->authorize('update', $user);
         return view('users.edit', compact('user'));//绑定，在将用户数据与视图进行绑定之后，便可以在视图上通过  $user  来访问用户对象
 
     }
     public function update(User $user, Request $request)
     {
+        $this->authorize('update', $user);
+
         $this->validate($request,[
             'name' => 'required|max:50',
             'password' => 'nullable|confirmed|min:6'
