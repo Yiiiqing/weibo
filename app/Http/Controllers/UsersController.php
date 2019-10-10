@@ -14,14 +14,22 @@ class UsersController extends Controller
     //PHP 的构造器方法，当一个类对象被创建之前该方法将会被调
     public function __construct()
     {
-        $this->middleware('auth',[
-            'except' => ['show','create','store']
+        $this->middleware('auth', [
+            'except' => ['show', 'create', 'store']
         ]);
+        //除了 XXX 需要授权，别的都公开可以访问。
 
         $this->middleware('guest',[
-            'guest' => ['create']
+            'only' => ['create']
         ]);
     }
+    //列表
+    public function index()
+    {
+        $users = User::paginate(10);//指定分页，每页十行
+        return view('users.index', compact('users'));
+    }
+    //创建
     public function create()
     {
         return view('users.create');
