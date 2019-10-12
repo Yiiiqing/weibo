@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;//+因为已经声明了namespace，使用 User Model需要这么加
 use Auth;
+use Mail;
 
 class UsersController extends Controller
 {
@@ -16,7 +17,7 @@ class UsersController extends Controller
     {
         //除了 XXX 需要授权，别的都公开可以访问。
         $this->middleware('auth', [
-            'except' => ['show', 'create', 'store', 'index']
+            'except' => ['show', 'create', 'store', 'index', 'confirmEmail']
         ]);
 
         $this->middleware('guest',[
@@ -58,10 +59,15 @@ class UsersController extends Controller
             'email' => $request->email,
             'password' => bcrypt($request->password),
         ]);
+        //邮箱
+        $this->sendEmailConfirmationTo($user);
+        session()->flash('success','验证邮件已发送到你的注册邮箱上，请注意查收。');
+        return redirect('/');
 
-        Auth::login($user);
-        session()->flash('success','欢迎，您将在这里开启一段新的旅程~');//flash  方法接收两个参数，第一个为会话的键，第二个为会话的值
-        return redirect()->route('users.show',[$user]);
+        //不增加邮箱验证的话
+        // Auth::login($user);
+        // session()->flash('success','欢迎，您将在这里开启一段新的旅程~');//flash  方法接收两个参数，第一个为会话的键，第二个为会话的值
+        // return redirect()->route('users.show',[$user]);
     }
     public function edit(User $user)
     {
@@ -96,5 +102,31 @@ class UsersController extends Controller
         $user->delete();
         session()->flash('success','成功删除用户！');
         return back();
+    }
+    //验证邮箱成功
+    public function confirmEmail($token)
+    {
+        $user = User::where('activation_token', $token)->firstOrFail();//查询不到返回 404
+
+        $user->activated = true;
+        $user->activation_token = null;
+        $user->save();
+
+        Auth::login($user);
+        session()->flash('success', '恭喜你，激活成功！');
+        return redirect()->route('users.show',[$user]);
+    }
+    protected function sendEmailConfirmationTo($user)
+    {
+        $view = 'emails.confirm';
+        $data = compact('user');
+        $from = 'y.zhang@live.com';
+        $name = 'Yiqing';
+        $to = $user->email;
+        $subject = '感谢注册Weibo 应用！请确认你的邮箱。';
+
+        Mail::send($view, $data, function($message) use ($from, $name, $to, $subject){
+            $message->from($from, $name)->to($to)->subject($subject);
+        });
     }
 }
