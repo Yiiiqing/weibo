@@ -58,6 +58,9 @@ class User extends Authenticatable
     {
         $hash = md5(strtolower(trim($this->attributes['email'])));//trim提出前后空白,然后转小写，然后md5转码
         return "http://www.gravatar.com/avatar/$hash?s=$size";
-
+    }
+    public function statuses()
+    {
+        return $this->hasMany(Status::class);
     }
 }
