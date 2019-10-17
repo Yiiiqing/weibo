@@ -26,4 +26,8 @@ class UserPolicy
     {
         return $currentUser->is_admin && $currentUser->id !== $user->id;
     }
+    public function list(User $currentUser, User $user)
+    {
+        return $currentUser->is_admin;
+    }
 }
