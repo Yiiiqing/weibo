@@ -11,7 +11,7 @@ class StatusesController extends Controller
     {
         $this->middleware('auth');
     }
-
+    //添加
     public function store(Request $request)
     {
         $this->validate($request, [
@@ -24,6 +24,14 @@ class StatusesController extends Controller
         ]);
 
         session()->flash('success','发布成功！');
+        return redirect()->back();
+    }
+    //删除
+    public function destroy(Status $status)//隐形路由模型绑定，传入的是 id，但是 laravel 自动查找并注入对象
+    {
+        $this->authorize('destroy', $status);
+        $status->delete();
+        session()->flash('success', '微博已被成功删除！');
         return redirect()->back();
     }
 }
